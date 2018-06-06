@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">EventFinderAndroid</string>
+    <string name="app_name">Event Finder</string>
+    <string name="string_welcome">Welcome to Event Finder!</string>
+    <string name="string_msg">Find events nearby and save them</string>
+    <string name="saved">Saved Events</string>
+    <string name="search">Search Events</string>
+    <string name="home">Home</string>
 </resources>
