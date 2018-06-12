@@ -1,8 +1,15 @@
 <resources>
     <string name="app_name">Event Finder</string>
-    <string name="string_welcome">Welcome to Event Finder!</string>
-    <string name="string_msg">Find events nearby and save them</string>
+    <string name="string_welcome">Welcome to Event Finder.</string>
+    <string name="string_msg">Find events nearby and save them.</string>
     <string name="saved">Saved Events</string>
     <string name="search">Search Events</string>
     <string name="home">Home</string>
+    <string name="search_location_hint">Enter location</string>
+    <string name="search_keyword_hint">Enter keyword (i.e. Music, Theatre..)</string>
+    <string name="location">Enter location</string>
+    <string name="date">Choose date range</string>
+    <string name="today">Today</string>
+    <string name="this_week">This Week</string>
+    <string name="next_week">Next Week</string>
 </resources>
