@@ -10,12 +10,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
@@ -34,7 +36,7 @@ import java.util.HashMap;
 public class SearchActivity extends AppCompatActivity {
 
     ProgressBar progressBar;
-    ListView tvResults;
+    ListView lvResults;
     EditText etLocation;
     EditText etKeyword;
 
@@ -42,6 +44,8 @@ public class SearchActivity extends AppCompatActivity {
 
     String appKey = "APP_KEY";
     String date = "All";
+
+    private SQLiteDatabaseHandler db;
 
 
     // Create menu
@@ -76,7 +80,7 @@ public class SearchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search);
 
         progressBar = findViewById(R.id.progressBar);
-        tvResults =  findViewById(R.id.tvResults);
+        lvResults =  findViewById(R.id.lvResults);
         etLocation = findViewById(R.id.etLocation);
         etKeyword = findViewById(R.id.etKeyword);
         eventsList = new ArrayList<>();
@@ -89,6 +93,8 @@ public class SearchActivity extends AppCompatActivity {
                 new FetchEvents().execute();
             }
         });
+
+        db = new SQLiteDatabaseHandler(this);
 
     }
 
@@ -145,19 +151,35 @@ public class SearchActivity extends AppCompatActivity {
                for (int i = 0; i < eventsArr.length(); i++) {
                     try {
                         JSONObject newObj = eventsArr.getJSONObject(i);
-                        String title = newObj.getString("title");
-                        String venue = newObj.getString("venue_name");
-                        String start_time = newObj.getString("start_time");
-                        String venue_address = newObj.getString("venue_address");
-                        String city = newObj.getString("city_name");
+                        final String title = newObj.getString("title");
+                        final String venue = newObj.getString("venue_name");
+                        final String start_time = newObj.getString("start_time");
+                        final String venue_address = newObj.getString("venue_address");
+                        final String city = newObj.getString("city_name");
 
                         HashMap<String, String> event = new HashMap<>();
 
                         event.put("title", title + " @ " + venue);
                         event.put("start_time", "Date: " + start_time);
-                        event.put("venue_address", "Venue address: " + venue_address + ", " + city);
+
+                        if (venue_address != "null") {
+                            event.put("venue_address", "Venue address: " + venue_address + ", " + city);
+                        } else {
+                            event.put("venue_address", "Venue address: No street address available, " + city);
+                        }
 
                         eventsList.add(event);
+
+                        lvResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                                Event event = new Event(position + 1, title, venue, venue_address, start_time, city);
+                                db.addEvent(event);
+
+                                //showToast(title + " " + venue + " " + venue_address + " " + start_time + " " + city);
+                            }
+                        });
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -167,7 +189,7 @@ public class SearchActivity extends AppCompatActivity {
 
                 ListAdapter adapter = new SimpleAdapter(SearchActivity.this, eventsList, R.layout.list_item, new String[] { "title", "start_time", "venue_address" },
                         new int[] { R.id.title, R.id.start_time, R.id.venue_address });
-                        tvResults.setAdapter(adapter);
+                        lvResults.setAdapter(adapter);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -205,13 +227,4 @@ public class SearchActivity extends AppCompatActivity {
         toast.show();
     }
 }
-
-
-
-  /*  public void showToast(String text) {
-        int time = Toast.LENGTH_LONG;
-        Context context = getApplicationContext() ;
-        Toast toast = Toast.makeText(context, text, time);
-        toast.show();
-    } */
 

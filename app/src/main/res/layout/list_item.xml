@@ -23,10 +23,11 @@
 
     <TextView
         android:id="@+id/venue_address"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="@font/rubik_light"
         android:textColor="#5d5d5d"
         android:textStyle="bold"
-        android:drawableBottom="@drawable/bottom_border"/>
+        android:background="@drawable/bottom_border" />
+
 </LinearLayout>

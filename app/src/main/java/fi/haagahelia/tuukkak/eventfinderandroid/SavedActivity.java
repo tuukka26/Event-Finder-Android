@@ -6,8 +6,14 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import java.util.List;
 
 public class SavedActivity extends AppCompatActivity {
+
+    private SQLiteDatabaseHandler db;
 
     // Create menu
     @Override
@@ -39,5 +45,21 @@ public class SavedActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_saved);
+
+        db = new SQLiteDatabaseHandler(this);
+
+        List<Event> events = db.allEvents();
+
+        if (events != null) {
+            String[] eventItems = new String[events.size()];
+
+            for (int i = 0; i < events.size(); i++) {
+                eventItems[i] = events.get(i).toString();
+            }
+
+            ListView list = findViewById(R.id.lvList);
+            list.setAdapter(new ArrayAdapter<>(this,
+                    R.layout.custom_text, eventItems));
+        }
     }
 }
