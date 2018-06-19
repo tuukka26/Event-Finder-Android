@@ -96,6 +96,23 @@ public class SearchActivity extends AppCompatActivity {
 
         db = new SQLiteDatabaseHandler(this);
 
+        // For saving the events
+        lvResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String title = eventsList.get(position).get("title");
+                String start_time = eventsList.get(position).get("start_time");
+                String venue_address = eventsList.get(position).get("venue_address");
+
+                showToast("This event has been saved!");
+
+                Event event = new Event(title, venue_address, start_time);
+                db.addEvent(event);
+
+            }
+        });
+
     }
 
     //Fetch and parse the JSON response from Eventful API
@@ -151,11 +168,11 @@ public class SearchActivity extends AppCompatActivity {
                for (int i = 0; i < eventsArr.length(); i++) {
                     try {
                         JSONObject newObj = eventsArr.getJSONObject(i);
-                        final String title = newObj.getString("title");
-                        final String venue = newObj.getString("venue_name");
-                        final String start_time = newObj.getString("start_time");
-                        final String venue_address = newObj.getString("venue_address");
-                        final String city = newObj.getString("city_name");
+                        String title = newObj.getString("title");
+                        String venue = newObj.getString("venue_name");
+                        String start_time = newObj.getString("start_time");
+                        String venue_address = newObj.getString("venue_address");
+                        String city = newObj.getString("city_name");
 
                         HashMap<String, String> event = new HashMap<>();
 
@@ -170,16 +187,6 @@ public class SearchActivity extends AppCompatActivity {
 
                         eventsList.add(event);
 
-                        lvResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                                Event event = new Event(position + 1, title, venue, venue_address, start_time, city);
-                                db.addEvent(event);
-
-                                //showToast(title + " " + venue + " " + venue_address + " " + start_time + " " + city);
-                            }
-                        });
 
                     } catch (JSONException e) {
                         e.printStackTrace();

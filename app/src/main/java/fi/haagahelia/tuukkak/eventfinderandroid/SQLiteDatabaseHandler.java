@@ -13,16 +13,14 @@ import fi.haagahelia.tuukkak.eventfinderandroid.Event;
 
 public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "EventDB";
     private static final String TABLE_NAME = "Events";
     private static final String KEY_ID = "id";
     private static final String KEY_TITLE = "title";
-    private static final String KEY_VENUE = "venue";
     private static final String KEY_ADDRESS = "address";
     private static final String KEY_DATE = "date";
-    private static final String KEY_CITY = "city";
-    private static final String[] COLUMNS = { KEY_ID, KEY_TITLE, KEY_VENUE, KEY_ADDRESS, KEY_DATE, KEY_CITY };
+    private static final String[] COLUMNS = { KEY_ID, KEY_TITLE, KEY_ADDRESS, KEY_DATE };
 
     public SQLiteDatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -31,7 +29,7 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATION_TABLE = "CREATE TABLE Events ( " + "id INTEGER PRIMARY KEY AUTOINCREMENT, " + "title TEXT, "
-        + "venue TEXT, " + "address TEXT, " + "date TEXT, " + "city TEXT )";
+        + "address TEXT, " + "date TEXT )";
 
         db.execSQL(CREATION_TABLE);
     }
@@ -65,10 +63,8 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
         Event event = new Event();
         event.setId(Integer.parseInt(cursor.getString(0)));
         event.setTitle(cursor.getString(1));
-        event.setVenue(cursor.getString(2));
-        event.setAddress(cursor.getString(3));
-        event.setDate(cursor.getString(4));
-        event.setCity(cursor.getString(5));
+        event.setAddress(cursor.getString(2));
+        event.setDate(cursor.getString(3));
 
         return event;
     }
@@ -85,10 +81,8 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
                 event = new Event();
                 event.setId(Integer.parseInt(cursor.getString(0)));
                 event.setTitle(cursor.getString(1));
-                event.setVenue(cursor.getString(2));
-                event.setAddress(cursor.getString(3));
-                event.setDate(cursor.getString(4));
-                event.setCity(cursor.getString(5));
+                event.setAddress(cursor.getString(2));
+                event.setDate(cursor.getString(3));
                 events.add(event);
             } while (cursor.moveToNext());
         }
@@ -100,10 +94,8 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         values.put(KEY_TITLE, event.getTitle());
-        values.put(KEY_VENUE, event.getVenue());
         values.put(KEY_ADDRESS, event.getAddress());
         values.put(KEY_DATE, event.getDate());
-        values.put(KEY_CITY, event.getCity());
 
         db.insert(TABLE_NAME,null, values);
         db.close();
