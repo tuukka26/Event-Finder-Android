@@ -40,13 +40,20 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
         this.onCreate(db);
     }
 
+    public void deleteAll() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_NAME, null, null);
+        db.execSQL("delete from " + TABLE_NAME);
+        db.close();
+    }
+
     public void deleteOne(Event event) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_NAME, "id = ?", new String[] { String.valueOf(event.getId()) });
         db.close();
     }
 
-    public Event getEvent(int id) {
+  /*  public Event getEvent(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_NAME,
                 COLUMNS,
@@ -68,7 +75,7 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
 
         return event;
     }
-
+*/
     public List<Event> allEvents() {
         List<Event> events = new LinkedList<Event>();
         String query = "SELECT * FROM " + TABLE_NAME;

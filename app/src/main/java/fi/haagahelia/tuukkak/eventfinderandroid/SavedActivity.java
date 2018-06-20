@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -23,6 +24,7 @@ public class SavedActivity extends AppCompatActivity {
     ListView lvList;
     TextView noData;
     TextView tvDelete;
+    Button btnDeleteAll;
 
     // Create menu
     @Override
@@ -58,6 +60,7 @@ public class SavedActivity extends AppCompatActivity {
         db = new SQLiteDatabaseHandler(this);
         noData = findViewById(android.R.id.empty);
         tvDelete = findViewById(R.id.tvDelete);
+        btnDeleteAll = findViewById(R.id.btnDeleteAll);
 
         // Get all events from DB
         final List<Event> events = db.allEvents();
@@ -71,6 +74,7 @@ public class SavedActivity extends AppCompatActivity {
 
             if (eventItems.length > 0) {
                 tvDelete.setVisibility(View.VISIBLE);
+                btnDeleteAll.setVisibility(View.VISIBLE);
             }
 
             noData.setVisibility(View.GONE);
@@ -115,6 +119,40 @@ public class SavedActivity extends AppCompatActivity {
                 lvList.setEmptyView(noData);
             }
         });
+
+        //Onclick listener to delete all events with warning dialog
+        btnDeleteAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SavedActivity.this);
+
+                alertDialogBuilder.setTitle(R.string.warning);
+
+                alertDialogBuilder
+                        .setMessage(R.string.warning_msg_all)
+                        .setCancelable(false)
+                        .setPositiveButton(R.string.button_yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                db.deleteAll();
+                                finish();
+                                startActivity(getIntent());
+                            }
+                        })
+                        .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                alertDialog.show();
+            }
+        });
+
     }
 
     @Override
@@ -127,4 +165,5 @@ public class SavedActivity extends AppCompatActivity {
         Intent intent = new Intent(SavedActivity.this, SearchActivity.class);
         startActivity(intent);
     }
+
 }
