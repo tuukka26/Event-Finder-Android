@@ -10,13 +10,14 @@
     <string name="location">Enter city name</string>
     <string name="date">Choose date</string>
     <string name="today">Today</string>
-    <string name="this_week">This Week</string>
-    <string name="next_week">Next Week</string>
+    <string name="this_week">Next 7 days</string>
+    <string name="next_week">Next 30 days</string>
     <string name="tap_to_save">Tap on an event to save it.</string>
     <string name="tap_to_delete">Tap on an event to delete it.</string>
     <string name="warning">Warning</string>
     <string name="warning_msg">Are you sure you want to remove this event? This can not be undone.</string>
     <string name="button_yes">Yes</string>
     <string name="button_cancel">Cancel</string>
-    <string name="no_data">You have no saved events.</string>
+    <string name="no_data">You have no saved events.\n Click here to search for events.</string>
+    <string name="no_results">No events found with the given parameters.</string>
 </resources>

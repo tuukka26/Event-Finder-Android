@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -30,8 +31,16 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import static java.util.Calendar.DATE;
 
 public class SearchActivity extends AppCompatActivity {
 
@@ -39,11 +48,41 @@ public class SearchActivity extends AppCompatActivity {
     ListView lvResults;
     EditText etLocation;
     EditText etKeyword;
+    TextView tvSave;
 
     ArrayList<HashMap<String, String>> eventsList;
 
     String appKey = "APP_KEY";
-    String date = "All";
+
+    //Default if no date range selected
+    String date = "Future";
+
+    //Get today's date in correct format
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    Calendar calendar = Calendar.getInstance();
+    Date today = calendar.getTime();
+    String todayStr = sdf.format(today);
+
+    // Specific formatting for date ranges needed for the search query
+    SimpleDateFormat specialDateFormat = new SimpleDateFormat("yyyyMMdd00");
+    String todaySpecialFormat = specialDateFormat.format(today);
+
+    // Method to add days or months to today's date
+    public String addToDate(String dayOrMonth, int amount) {
+        calendar.setTime(today);
+
+        if (dayOrMonth == "month") {
+            calendar.add(Calendar.MONTH, amount);
+        } else if (dayOrMonth == "day") {
+            calendar.add(Calendar.DAY_OF_YEAR, amount);
+        }
+
+        Date date = calendar.getTime();
+        String addToDate = specialDateFormat.format(date);
+
+        return addToDate;
+
+    }
 
     private SQLiteDatabaseHandler db;
 
@@ -129,7 +168,7 @@ public class SearchActivity extends AppCompatActivity {
             eventsList.clear();
 
             try{
-                URL url = new URL("http://api.eventful.com/json/events/search?app_key=" + appKey + "&keywords=" + keyword + "&where=" + location + "&date=" + date + "&page_size=20&sort_order=popularity&change_multi_day_start=true");
+                URL url = new URL("http://api.eventful.com/json/events/search?app_key=" + appKey + "&keywords=" + keyword + "&where=" + location + "&t=" + date + "&page_size=20&change_multi_day_start=true");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 try {
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
@@ -154,30 +193,43 @@ public class SearchActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String response) {
+
             if(response == null) {
                 showToast("An error occurred, please try again");
             }
             progressBar.setVisibility(View.GONE);
             Log.i("INFO", response);
 
+
             try {
                 JSONObject object = (JSONObject) new JSONTokener(response).nextValue();
                 JSONObject eventsObj = object.getJSONObject("events");
                 JSONArray eventsArr = eventsObj.getJSONArray("event");
 
-               for (int i = 0; i < eventsArr.length(); i++) {
+                for (int i = 0; i < eventsArr.length(); i++) {
                     try {
                         JSONObject newObj = eventsArr.getJSONObject(i);
                         String title = newObj.getString("title");
                         String venue = newObj.getString("venue_name");
                         String start_time = newObj.getString("start_time");
+
+                        // Format the date from the response
+                        Date tempDate = null;
+                        try {
+                            tempDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(start_time);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+                        String eventDate = new SimpleDateFormat("dd-MM-yyyy").format(tempDate);
+
                         String venue_address = newObj.getString("venue_address");
                         String city = newObj.getString("city_name");
 
                         HashMap<String, String> event = new HashMap<>();
 
                         event.put("title", title + " @ " + venue);
-                        event.put("start_time", "Date: " + start_time);
+                        event.put("start_time", "Date: " + eventDate);
 
                         if (venue_address != "null") {
                             event.put("venue_address", "Venue address: " + venue_address + ", " + city);
@@ -187,6 +239,11 @@ public class SearchActivity extends AppCompatActivity {
 
                         eventsList.add(event);
 
+                        tvSave = findViewById(R.id.tvSave);
+                        if (eventsList.size() > 0) {
+                            tvSave.setVisibility(View.VISIBLE);
+                        }
+
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -194,16 +251,16 @@ public class SearchActivity extends AppCompatActivity {
                     }
                 }
 
-                ListAdapter adapter = new SimpleAdapter(SearchActivity.this, eventsList, R.layout.list_item, new String[] { "title", "start_time", "venue_address" },
-                        new int[] { R.id.title, R.id.start_time, R.id.venue_address });
-                        lvResults.setAdapter(adapter);
+                ListAdapter adapter = new SimpleAdapter(SearchActivity.this, eventsList, R.layout.list_item, new String[]{"title", "start_time", "venue_address"},
+                        new int[]{R.id.title, R.id.start_time, R.id.venue_address});
+                lvResults.setAdapter(adapter);
 
             } catch (JSONException e) {
                 e.printStackTrace();
-            }
-
+                showToast("No events found with the given parameters.");
+                }
         }
-        }
+    }
 
         //Change date depending on the radio button selection
         public void onRadioButtonClicked (View view) {
@@ -213,15 +270,15 @@ public class SearchActivity extends AppCompatActivity {
             switch(view.getId()) {
                 case R.id.rbToday:
                     if (checked)
-                        date = "Today";
+                        date = todayStr;
                     break;
                 case R.id.rbThisWeek:
                     if (checked)
-                        date = "Next week";
+                        date = todaySpecialFormat + "-" + addToDate("day", 7);
                     break;
-                case R.id.rbNextWeek:
+                case R.id.rbNextMonth:
                     if (checked)
-                        date = "This week";
+                        date = todaySpecialFormat + "-" + addToDate("month", 1);
                     break;
             }
 

@@ -22,6 +22,7 @@ public class SavedActivity extends AppCompatActivity {
 
     ListView lvList;
     TextView noData;
+    TextView tvDelete;
 
     // Create menu
     @Override
@@ -56,7 +57,9 @@ public class SavedActivity extends AppCompatActivity {
 
         db = new SQLiteDatabaseHandler(this);
         noData = findViewById(android.R.id.empty);
+        tvDelete = findViewById(R.id.tvDelete);
 
+        // Get all events from DB
         final List<Event> events = db.allEvents();
 
         if (events != null) {
@@ -66,12 +69,17 @@ public class SavedActivity extends AppCompatActivity {
                 eventItems[i] = events.get(i).toString();
             }
 
+            if (eventItems.length > 0) {
+                tvDelete.setVisibility(View.VISIBLE);
+            }
+
             noData.setVisibility(View.GONE);
             lvList = findViewById(R.id.lvList);
             lvList.setAdapter(new ArrayAdapter<>(this,
                     R.layout.custom_text, eventItems));
         }
 
+        // Set onclick listener to remove events with warning dialog
         lvList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
@@ -105,9 +113,6 @@ public class SavedActivity extends AppCompatActivity {
 
                 // In case no events have been saved, a message will be shown
                 lvList.setEmptyView(noData);
-
-              //  db.deleteOne(events.get(position));
-              //  startActivity(getIntent());
             }
         });
     }
@@ -116,5 +121,10 @@ public class SavedActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         lvList.setEmptyView(noData);
+    }
+
+    public void navigateToSearch(View view) {
+        Intent intent = new Intent(SavedActivity.this, SearchActivity.class);
+        startActivity(intent);
     }
 }
