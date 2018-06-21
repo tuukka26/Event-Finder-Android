@@ -32,6 +32,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -51,8 +52,6 @@ public class SearchActivity extends AppCompatActivity {
     TextView tvSave;
 
     ArrayList<HashMap<String, String>> eventsList;
-
-    String appKey = "APP_KEY";
 
     //Default if no date range selected
     String date = "Future";
@@ -113,6 +112,7 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -168,7 +168,7 @@ public class SearchActivity extends AppCompatActivity {
             eventsList.clear();
 
             try{
-                URL url = new URL("http://api.eventful.com/json/events/search?app_key=" + appKey + "&keywords=" + keyword + "&where=" + location + "&t=" + date + "&page_size=20&change_multi_day_start=true");
+                URL url = new URL("http://api.eventful.com/json/events/search?app_key=" + getString(R.string.APP_KEY) + "&keywords=" + keyword + "&where=" + location + "&t=" + date + "&page_size=20&change_multi_day_start=true");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 try {
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));

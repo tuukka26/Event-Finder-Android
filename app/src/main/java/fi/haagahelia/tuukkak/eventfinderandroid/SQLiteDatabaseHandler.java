@@ -53,29 +53,6 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-  /*  public Event getEvent(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_NAME,
-                COLUMNS,
-                " id = ?",
-                new String[] { String.valueOf(id) },
-                null,
-                null,
-                null,
-                null);
-
-        if (cursor != null)
-            cursor.moveToFirst();
-
-        Event event = new Event();
-        event.setId(Integer.parseInt(cursor.getString(0)));
-        event.setTitle(cursor.getString(1));
-        event.setAddress(cursor.getString(2));
-        event.setDate(cursor.getString(3));
-
-        return event;
-    }
-*/
     public List<Event> allEvents() {
         List<Event> events = new LinkedList<Event>();
         String query = "SELECT * FROM " + TABLE_NAME;
